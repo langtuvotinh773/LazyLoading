@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<!-- saved from url=(0058)https://www.devtxt.com/blog/asp-net-mvc-infinite-scrolling -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt</title>
+
+    <link href="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/bootstrap.min.css" rel="stylesheet">
+    <link href="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/style.css" rel="stylesheet">
+    <link href="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/icons.css" rel="stylesheet">
+    <link href="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/animate.min.css" rel="stylesheet">
+
+    <link href="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/Site.min.css" rel="stylesheet" type="text/css">
+    <link href="https://www.devtxt.com/images/v-635642812139060922/devtxtfavicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <link rel="me" type="text/html" href="https://www.twitter.com/philoushka">
+    <link rel="me" type="text/html" href="https://www.github.com/philoushka">
+    <link rel="me" type="text/html" href="https://plus.google.com/105911890873448508505">
+    <link rel="alternate" type="application/rss+xml" title="Phil Campbell - DevTxt - RSS" href="https://www.devtxt.com/blog/rss">
+    <meta itemprop="name" content="ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view.">
+    <meta itemprop="description">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    
+    <link rel="canonical" href="http://www.devtxt.com/blog/asp-net-mvc-infinite-scrolling">
+    <meta name="twitter:site" content="DevTxt">
+    <meta name="twitter:creator" content="Phil Campbell">
+    <meta name="twitter:creator:id" content="philoushka">
+    <meta name="twitter:image:src" content="http://i.stack.imgur.com/rrdlO.jpg?s=128&amp;g=1">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view.">
+    <meta name="twitter:description" content="If you&#39;ve got a large set of data that you want lazy loaded, here&#39;s one solution.">
+
+</head>
+<body id="home">
+    <div id="wrap">
+        <div id="main-nav" class="">
+            <div class="container">
+                <div class="nav-header">
+                    <a class="nav-brand" href="https://www.devtxt.com/"><i class="icon-eye"></i>DevTxt</a>
+<form action="https://www.devtxt.com/PostSearch" class="navbar-form navbar-right" method="post">                        <div class="row">
+                            <input type="text" id="searchText" name="searchText" placeholder="Search" class="form-control col-lg-8">
+                        </div>
+</form>                </div>
+            </div>
+        </div>
+        <section id="hero" class="light-typo">
+            <div id="cover-image" class="image-bg animated fadeIn" style="background-position: 50% -125%; background-image: url(&quot;../images/header/autumn1.jpg&quot;);"></div>
+            <div class="container welcome-content">
+                <div class="middle-text">
+                    <h1>ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view.</h1>
+                    <h2>If you've got a large set of data that you want lazy loaded, here's one solution.</h2>
+                </div>
+            </div>
+        </section>
+        <div id="start" class="container content">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    
+
+
+<div class="post-date">
+    09-Nov-2014 | <a href="https://www.devtxt.com/about">Phil Campbell</a>
+</div>
+<p>Sometimes you've got a page/view where you need to present a lot of data. I shudder when developing large pages full of data that the user won't need; it's wasteful, and lots of data creates confusion and data overload for the user.</p>
+<h3>Strategies For Displaying Lots of Data</h3>
+<p>I sometimes get a request from users like:</p>
+<blockquote>
+<p>Can you please show a list of the last 50 items that went through the system? I just want to go and see the stream of items most recent in order as they were processed/received.</p>
+</blockquote>
+<p>The task then is to display that data. You can't <em>guess</em> and cap how many records the user wants to see - your guess will inevitably be wrong. Splashing <em>every</em> record on the page isn't right, either.</p>
+<ol>
+<li>
+<p><strong>Search</strong> - I try to make this the default and try to convince users that they should search for the items that they want. This strategy helps everyone: it retrieves the most relevant data that the user wants, and is light on your web app. Sometimes users push back on this as it forces them to think about what they want, rather than visually searching all items on the page. I'm even done with the typical <a href="http://i.imgur.com/tJmf9CP.jpg">awful one-to-one-textbox-to-column</a> layout. Just give the user a single textbox (search-engine style) where they can type in some text, and perhaps give them some date range inputs if dates are involved. All this is solved when you implement full-text catalog. </p>
+</li>
+<li>
+<p><strong>Pagination</strong> - The old method of providing <a href="http://i.imgur.com/YcZ3Tof.png">page numbers with next and previous buttons</a>. <a href="http://stackoverflow.com/questions/446196/how-do-i-do-pagination-in-asp-net-mvc">It's possible</a>, but just not optimal. For me, it just doesn't feel right.   
+</p>
+</li>
+<li>
+<p><strong>Infinite Scroll</strong> - the user will pull the data as they need it. This satisfies that user requirement above.</p>
+</li>
+</ol>
+<h3>Infinite Scroll NuGet Package</h3>
+<p>I've created a NuGet package for MVC applications that will add infinite scrolling to your tables, (un)ordered lists, divs, or any other repeating element in your MVC views. The user simply scrolls down to the end of the page when they want to see more data; JavaScript takes over from there. </p>
+<p>It created a better user experience: the user to retrieves a smaller page initially, decreases the user's clicks, and to provides quick responses when asking to see more data.</p>
+<p><a href="https://www.nuget.org/packages/MVC-Infinite-Scroll"><img src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/Kdwax5q.jpg" alt="install package mvc infinite scroll"></a></p>
+<pre><code>Install-Package MVC-Infinite-Scroll
+</code></pre>
+
+<p>The package will install the necessary bits for infinite scrolling, and a full demo controller+view example. </p>
+<ul>
+<li>1 JavaScript file - <code>infiniteScroll.js</code></li>
+<li>1 demo controller</li>
+<li>2 demo views and 1 image</li>
+<li>sample data in <code>App_Data\Customers.csv</code></li>
+</ul>
+<p>When you're finished with the demo, you can simply delete the controller and views named <code>InfiniteScrollDemo</code>.</p>
+<h3>Open Source On GitHub</h3>
+<p>I've put a demo project, the NuGet package, and its source on the <a href="https://github.com/philoushka/Mvc-Infinite-Scroll-Grid">MVC Infinite Scroll GitHub repo</a>.</p>
+<h3>Infinite Scroll Demo</h3>
+<p>Check out the demo at: <a href="http://mvcinfinitescroll.azurewebsites.net/">http://mvcinfinitescroll.azurewebsites.net/</a></p>
+<h3>Deep Dive</h3>
+<p>Here's how it works:</p>
+<ol>
+<li>The user navigates to a controller action method. It determines that the user wants to build a list of data. </li>
+<li>The controller calls out to get the data. Sort/order it as you like. </li>
+<li>The sample data is a <code>Dictionary&lt;int,Customer&gt;</code> because I <strong>wanted to show row numbers</strong>. If you don't care about row numbers in your data, use <code>IEnumerable&lt;Customer&gt;</code>.</li>
+<li>It stores that large chunk of data in <code>Session</code> or <code>Cache</code> as you like.</li>
+<li>It chooses <em>n</em> items from there, and puts it into <code>ViewBag</code>.</li>
+<li>On the view, there is a <code>&lt;table&gt;</code> with a CSS class <code>infinite-scroll</code>.</li>
+<li>The view is rendered, and the data that's been put into <code>ViewBag</code> is sent to a partial view that contains the repeated HTML. In the sample's case, it's a table row and related columns. </li>
+<li>JavaScript is loaded to handle the event of scrolling the page to the bottom.</li>
+<li>When the page is scrolled to the bottom, an AJAX request is sent to a controller action method, along with a <code>pageNumber</code> value. The <code>Session</code> data is reloaded and the next <em>n</em> items are taken, offset by the <code>pageNumber</code>.</li>
+<li>That partial view is rendered with the next <em>n</em> items, and the rendered HTML is returned back to the page.</li>
+<li>The JavaScript then appends the rendered HTML to the <code>&lt;tbody&gt;</code> element of the element with class <code>infinite-scroll</code>.</li>
+<li>The row appears, and the user can scroll again. Rinse and repeat until there are no more rows to deliver from <code>Session</code>.</li>
+</ol>
+<iframe src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/WelllitRealisticElephantbeetle.html" frameborder="0" scrolling="no" width="640" height="480" style="-webkit-backface-visibility: hidden;-webkit-transform: scale(1);"></iframe>
+<div class="post-date">
+    tagged in category | <a class="tag" href="https://www.devtxt.com/tagged/asp.net-mvc">asp.net-mvc</a><a class="tag" href="https://www.devtxt.com/tagged/jQuery">jQuery</a></div>
+<h3>Comments?</h3>
+
+<a href="https://www.twitter.com/philoushka">Tweet me a comment about this post.</a>
+
+<div id="author" class="clearfix">
+    <img class="img-circle" alt="" src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/author-phil.jpg" height="96" width="96">
+    <div class="author-info">
+        <h3>Phil Campbell</h3>
+        <p>You can follow me on <a href="https://www.twitter.com/philoushka">Twitter</a>.</p>
+    </div>
+</div>
+
+                </div>
+            </div>
+        </div>
+        <div id="mid" class="container">
+            <div class="row">
+                <div style="position:relative; width:728px; margin:auto;">
+                    <script type="text/javascript" async="" src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/ga.js.download"></script><script src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/ca-pub-5755628217423786.js.download"></script><script async="" src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/adsbygoogle.js.download"></script>
+                    <ins class="adsbygoogle" style="margin:0 auto;float:none;display:inline-block;width:728px;height:90px" data-ad-client="ca-pub-5755628217423786" data-ad-slot="4405859356" data-adsbygoogle-status="done"><ins id="aswift_0_expand" style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px;background-color:transparent"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px;background-color:transparent"><iframe width="728" height="90" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" allowfullscreen="true" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){setTimeout(h,0)}else if(h.match){try{h=s.upd(h,i)}catch(e){}w.location.replace(h)}}" id="aswift_0" name="aswift_0" style="left:0;position:absolute;top:0;" src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/saved_resource.html"></iframe></ins></ins></ins>
+                    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <div class="footer">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-4 col-md-4 footer-widget" id="myBloggingStats"><h3>My Stats</h3>
+
+<div class="stats">
+        <div class="line">
+            <span class="counter">1</span>
+            <span class="caption">Avg. Monthly Posts</span>
+        </div>
+        <div class="line">
+            <span class="counter">0</span>
+            <span class="caption">Posts In Last 6 Months</span>
+        </div>
+</div>
+</div>
+                        <div class="col-sm-4 col-md-4 footer-widget" id="recentPosts">
+<h3>Recent Posts</h3>
+<div class="post-recent-widget">
+    <div class="row">
+        <div class="col-sm-12">
+
+                <div class="media">
+                    <a class="pull-left" href="https://www.devtxt.com/blog/2015-awesome-links"><img class="media-object" src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/img2.jpg" width="80" alt=""></a>
+                    <div class="media-body">
+                        <h4 class="media-heading"><a href="https://www.devtxt.com/blog/2015-awesome-links">Great Stuff From 2015</a></h4>
+                        <p class="post-date">20-Dec-2015</p>
+                    </div>
+                </div>
+                <div class="media">
+                    <a class="pull-left" href="https://www.devtxt.com/blog/msdn-channel-9-ios-app-utterly-broken"><img class="media-object" src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/img2.jpg" width="80" alt=""></a>
+                    <div class="media-body">
+                        <h4 class="media-heading"><a href="https://www.devtxt.com/blog/msdn-channel-9-ios-app-utterly-broken">The MSDN Channel 9 iOS App is Utterly Broken</a></h4>
+                        <p class="post-date">01-Nov-2015</p>
+                    </div>
+                </div>
+                <div class="media">
+                    <a class="pull-left" href="https://www.devtxt.com/blog/windows-admins-no-more-excuses-for-outdated-iis-tls-settings"><img class="media-object" src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/img2.jpg" width="80" alt=""></a>
+                    <div class="media-body">
+                        <h4 class="media-heading"><a href="https://www.devtxt.com/blog/windows-admins-no-more-excuses-for-outdated-iis-tls-settings">Windows Admins: No More Excuses For Outdated IIS TLS Settings</a></h4>
+                        <p class="post-date">14-Jul-2015</p>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div></div>
+                        <div class="col-sm-4 col-md-4 footer-widget clearfix" id="topTags"><h3>Tags</h3>
+<ul class="tags">
+        <li><a class="tag" href="https://www.devtxt.com/tagged/powershell">powershell</a></li>
+        <li><a class="tag" href="https://www.devtxt.com/tagged/visual-studio">visual-studio</a></li>
+        <li><a class="tag" href="https://www.devtxt.com/tagged/windows">windows</a></li>
+        <li><a class="tag" href="https://www.devtxt.com/tagged/C%23">C#</a></li>
+        <li><a class="tag" href="https://www.devtxt.com/tagged/sql-server">sql-server</a></li>
+        <li><a class="tag" href="https://www.devtxt.com/tagged/jQuery">jQuery</a></li>
+        <li><a class="tag" href="https://www.devtxt.com/tagged/azure">azure</a></li>
+        <li><a class="tag" href="https://www.devtxt.com/tagged/bing">bing</a></li>
+        <li><a class="tag" href="https://www.devtxt.com/tagged/search">search</a></li>
+        <li><a class="tag" href="https://www.devtxt.com/tagged/sql">sql</a></li>
+</ul></div>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <div class="container">
+                    <p class="pull-left">
+                        ©  2016 <a href="https://www.devtxt.com/about">Phil Campbell</a><br>
+                        
+                        <a href="http://creativecommons.org/licenses/by/3.0/">
+                            <img id="imgCC" alt="Creative Commons License" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAACrsar///9ERETMzMzu7u53d3eIiIhVVVVmZmYNDg0ODg6UmZOZmZmqqqoREREiIiIzMzMNDQ1ydnHKzsoZGRkgICBbXlshISFna2dCQkIPEA99gn2AgICGhoaHh4ckJSOPkI8nKCcuMC4xMzENDQyzuLJDQ0O7u7vFxsXGysbIzMg5Oznd3d07PTtBQkFLTEu6v7qumA/2AAAAtElEQVR4Xq2TRw7EMAhFAZf0num993b/y814hKJs4/jJKxs9fQEG95BTjBANE/D4SkQxYj0DKxphHBkfG7eIn0VP4XNMDRJGiLd3P2HokcxBKAG5JLFHrDfcXy7qKJzDmXKftM5UkpIOET+X/zsf6pqwAqnMVPyCfugI8XjlhFxml1AEmdIJ6bKd0EqIpUdpBoESUDzotGv30E54HzqecnxYNcLp2sEeYgVL9r0GfX+KU8A5X+INCo9agFfBAAAAAElFTkSuQmCC">
+                        </a>
+                        This blog and its contents are licensed under a <a href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 Unported License</a>.In short: share, remix, and respin it as you like, but you must provide attribution to me by name (Phil Campbell), and you must link to this page.
+                        </p><p>If you see an error, typo, or something that you'd like to correct, <a href="https://github.com/philoushka/blog">send me a pull request on GitHub</a>.</p>
+                    <p></p>
+                    <ul class="social-links pull-right">
+                        <li><a href="https://www.twitter.com/philoushka"><i class="icon-twitter"></i></a></li>
+                        <li><a href="https://www.stackoverflow.com/users/23199"><i class="icon-stackoverflow"></i></a></li>
+                        <li><a href="https://www.github.com/philoushka"><i class="icon-github"></i></a></li>
+                        <li><a href="https://www.linkedin.com/pub/phil-campbell/11/488/b98"><i class="icon-linkedin"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script type="text/javascript">var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-46720433-1']); _gaq.push(['_trackPageview']); (function () { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+    <script type="text/javascript" src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/jquery-2.1.3.min.js.download"></script>
+    <script type="text/javascript" src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/bootstrap.min.js.download"></script>
+    <script type="text/javascript" src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/placeholders.min.js.download"></script>
+    <script type="text/javascript" src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/wow.min.js.download"></script>
+    <script type="text/javascript" src="./ASP.NET MVC Infinite Scrolling - Lazy loading data onto your MVC view. - DevTxt_files/custom.js.download"></script>
+    <script type="text/javascript">
+        $(function () {
+            loadTopTags();
+            loadFeaturedRecentPosts();
+            randomizeHeaderImg();
+            activateBlogPostIntrosAsLinks();
+            loadMyBloggingStats();
+        });
+
+        function loadTopTags() {
+            $.get('/TopTags', function (data) {
+                $('#topTags').html(data);
+            });
+        }
+
+        function loadFeaturedRecentPosts() {
+            $.get('/GetFeaturedRecentPosts', function (data) {
+                $('#recentPosts').html(data);
+            });
+        }
+
+        function loadMyBloggingStats() {
+            $.get('/bloggingStats', function (data) {
+                $('#myBloggingStats').html(data);
+            });
+        }
+
+        function randomizeHeaderImg() {
+            var bgArray = [1, 2, 3, 4];
+            var randImg = bgArray[Math.floor(Math.random() * bgArray.length)];
+            var imgPath = "url(" + "../images/header/" + todaySeason() + randImg + ".jpg)";
+            $('#cover-image').css("background-image", imgPath);
+        }
+
+        Number.prototype.between = function (min, max) {
+            return this >= min && this <= max;
+        };
+
+        function todaySeason() {
+            var currMonth = (new Date()).getMonth() + 1;
+            if (currMonth.between(3, 5)) { return "spring"; }
+            if (currMonth.between(6, 8)) { return "summer"; }
+            if (currMonth.between(9, 10)) { return "autumn"; }
+            return "winter";
+        }
+
+        function activateBlogPostIntrosAsLinks() {
+            $(".postIntro").click(function () {
+                var url = $(this).parent().find("a:first").attr("href");
+                window.location.href = url;
+            });
+        }
+    </script>
+    
+
+
+<script type="text/javascript">function d_log(s) {
+                var ev = document.createEvent('events');
+                ev.initEvent('heartbeat_log', true, false);
+                document.body.setAttribute('heartbeat_attrib', s);
+                document.dispatchEvent(ev);
+            };</script><div id="heartbeat_msg_wrap"></div></body></html>
